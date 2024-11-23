@@ -9,6 +9,8 @@ import "solidity-coverage";
 import "@nomicfoundation/hardhat-verify";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+import "@nomicfoundation/hardhat-toolbox";
+import "@openzeppelin/hardhat-upgrades";
 
 // If not set, it uses ours Alchemy's default API key.
 // You can get your own at https://dashboard.alchemyapi.io
@@ -44,12 +46,39 @@ const config: HardhatUserConfig = {
   networks: {
     // View the networks that are pre-configured.
     // If the network you are looking for is not here you can add new network settings
-    hardhat: {
-      forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${providerApiKey}`,
-        enabled: process.env.MAINNET_FORKING_ENABLED === "true",
-      },
+    hardhat: {},
+    moksha: {
+      url: process.env.MOKSHA_RPC_URL || "",
+      chainId: 14800,
+      accounts:
+        process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
     },
+    satori: {
+      url: process.env.SATORI_RPC_URL || "",
+      chainId: 14801,
+      accounts:
+        process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
+    }
+  },
+  customChains: [
+      {
+        network: "moksha",
+        chainId: 14800,
+        urls: {
+          apiURL: "https://api.moksha.vanascan.io/api/",
+          browserURL: "https://moksha.vanascan.io",
+        }
+      },
+      {
+        network: "satori",
+        chainId: 14801,
+        urls: {
+          apiURL: process.env.SATORI_API_URL || "",
+          browserURL: process.env.SATORI_BROWSER_URL || "",
+        }
+      }
+    ]
+  },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${providerApiKey}`,
       accounts: [deployerPrivateKey],
@@ -132,6 +161,19 @@ const config: HardhatUserConfig = {
     etherscan: {
       apiKey: `${etherscanApiKey}`,
     },
+    paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
+  mocha: {
+    timeout: 40000,
+  },
+  gasReporter: {
+    enabled: true,
+    excludeContracts: ["mocks", "tests"],
+    include: ["../node_module/@openzeppelin/contracts-upgradeable"],
   },
   sourcify: {
     enabled: false,
