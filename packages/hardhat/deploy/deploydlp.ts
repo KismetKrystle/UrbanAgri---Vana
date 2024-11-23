@@ -1,4 +1,7 @@
 import { ethers } from 'ethers';
+import { deployments, ethers } from "hardhat";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
 import { IVana, IVanaDataDAO, IVanaERC20 } from '@vananetwork/sdk/contracts';
 
 // Replace these with own values
