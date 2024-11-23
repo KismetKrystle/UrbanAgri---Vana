@@ -1,106 +1,161 @@
-// SPDX-License-Identifier: Apache-2.0
-pragma solidity 0.8.24;
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+import { parseEther } from 'ethers';
+import { UAVToken } from '../typechain-types';
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import "@openzeppelin/contracts/utils/Nonces.sol";
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+describe('UAVToken', () => {
+  let deployer: any, owner: any, admin: any, user1: any, user2: any, user3: any, user4: any;
+  let uavToken: UAVToken;
 
-contract UAVToken is ERC20, ERC20Permit, ERC20Votes, Ownable2Step {
-    using EnumerableSet for EnumerableSet.AddressSet;
+  const deploy = async () => {
+    [deployer, owner, admin, user1, user2, user3, user4] = await ethers.getSigners();
+    const UAVTokenFactory = await ethers.getContractFactory('UAVToken');
+    uavToken = (await UAVTokenFactory.deploy('Urban Agri Token', 'UAV', owner.address)) as UAVToken;
+    await uavToken.deployed();
+    await uavToken.connect(owner).changeAdmin(admin.address);
+  };
 
-    address public admin;
-    bool public mintBlocked;
-    EnumerableSet.AddressSet private _blockList;
+  describe('UAVToken', () => {
+    beforeEach(async () => {
+      await deploy();
+    });
 
-    event MintBlocked();
-    event AdminChanged(address indexed oldAdmin, address indexed newAdmin);
-    event AddressBlocked(address indexed blockedAddress);
-    event AddressUnblocked(address indexed unblockedAddress);
+    it('should have correct params after deploy', async function () {
+      expect(await uavToken.owner()).to.equal(owner.address);
+      expect(await uavToken.admin()).to.equal(admin.address);
+      expect(await uavToken.name()).to.equal('Urban Agri Token');
+      expect(await uavToken.symbol()).to.equal('UAV');
+      expect(await uavToken.mintBlocked()).to.be.false;
+    });
 
-    error EnforceMintBlocked();
-    error UnauthorizedAdminAction(address account);
-    error UnauthorizedUserAction(address account);
+    it('should transfer ownership in 2 steps', async function () {
+      await uavToken.connect(owner).transferOwnership(user2.address);
+      expect(await uavToken.owner()).to.equal(owner.address);
+      await uavToken.connect(owner).transferOwnership(user3.address);
+      expect(await uavToken.owner()).to.equal(owner.address);
+      await uavToken.connect(user3).acceptOwnership();
+      expect(await uavToken.owner()).to.equal(user3.address);
+    });
 
-    modifier whenMintIsAllowed() {
-        if (mintBlocked) {
-            revert EnforceMintBlocked();
-        }
-        _;
-    }
+    it('should reject transferOwnership when non-owner', async function () {
+      await expect(uavToken.connect(admin).transferOwnership(user2.address)).to.be.revertedWith(
+        `UnauthorizedAdminAction("${admin.address}")`
+      );
+    });
 
-    modifier onlyAdmin() {
-        if (msg.sender != admin) {
-            revert UnauthorizedAdminAction(msg.sender);
-        }
-        _;
-    }
+    it('should change admin when owner', async function () {
+      await uavToken.connect(owner).changeAdmin(user2.address);
+      expect(await uavToken.admin()).to.equal(user2.address);
+    });
 
-    modifier whenNotBlocked(address from) {
-        if (_blockList.contains(from)) {
-            revert UnauthorizedUserAction(msg.sender);
-        }
-        _;
-    }
+    it('should reject changeAdmin when non-owner', async function () {
+      await expect(uavToken.connect(admin).changeAdmin(user2.address)).to.be.revertedWith(
+        `UnauthorizedAdminAction("${admin.address}")`
+      );
+    });
 
-    constructor(
-        string memory name,
-        string memory symbol,
-        address ownerAddress
-    ) ERC20(name, symbol) ERC20Permit(name) Ownable2Step(ownerAddress) {}
+    it('should block mint when owner', async function () {
+      await uavToken.connect(owner).blockMint();
+      expect(await uavToken.mintBlocked()).to.be.true;
+    });
 
-    function clock() public view override returns (uint48) {
-        return uint48(block.timestamp);
-    }
+    it('should reject blockMint when non-owner', async function () {
+      await expect(uavToken.connect(admin).blockMint()).to.be.revertedWith(
+        `UnauthorizedAdminAction("${admin.address}")`
+      );
+    });
 
-    function CLOCK_MODE() public pure override returns (string memory) {
-        return "mode=timestamp";
-    }
+    it('should mint when owner', async function () {
+      const mintAmount = parseEther('100');
+      expect(await uavToken.balanceOf(user2.address)).to.equal(0);
+      await uavToken.connect(owner).mint(user2.address, mintAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount);
+    });
 
-    function blockListLength() external view returns (uint256) {
-        return _blockList.length();
-    }
+    it('should reject mint when non-owner', async function () {
+      await expect(uavToken.connect(admin).mint(user1.address, parseEther('10'))).to.be.revertedWith(
+        `UnauthorizedAdminAction("${admin.address}")`
+      );
+    });
 
-    function blockListAt(uint256 index) external view returns (address) {
-        return _blockList.at(index);
-    }
+    it('should reject mint when minting is blocked', async function () {
+      await uavToken.connect(owner).blockMint();
+      await expect(uavToken.connect(owner).mint(user1.address, parseEther('10'))).to.be.revertedWith('EnforceMintBlocked()');
+    });
 
-    function _update(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) whenNotBlocked(from) {
-        super._update(from, to, amount);
-    }
+    it('should block address when admin', async function () {
+      expect(await uavToken.blockListLength()).to.equal(0);
+      await uavToken.connect(admin).blockAddress(user2.address);
+      expect(await uavToken.blockListLength()).to.equal(1);
+      expect(await uavToken.blockListAt(0)).to.equal(user2.address);
+    });
 
-    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
-        return super.nonces(owner);
-    }
+    it('should reject blockAddress when non-admin', async function () {
+      await expect(uavToken.connect(user3).blockAddress(user2.address)).to.be.revertedWith(
+        `UnauthorizedAdminAction("${user3.address}")`
+      );
+    });
 
-    function mint(address to, uint256 amount) external virtual onlyOwner whenMintIsAllowed {
-        _mint(to, amount);
-    }
+    it('should unblock address when admin', async function () {
+      await uavToken.connect(admin).blockAddress(user2.address);
+      await uavToken.connect(admin).unblockAddress(user2.address);
+      expect(await uavToken.blockListLength()).to.equal(0);
+    });
 
-    function changeAdmin(address newAdmin) external virtual onlyOwner {
-        address oldAdmin = admin;
-        admin = newAdmin;
-        emit AdminChanged(oldAdmin, newAdmin);
-    }
+    it('should reject unblockAddress when non-admin', async function () {
+      await expect(uavToken.connect(user3).unblockAddress(user2.address)).to.be.revertedWith(
+        `UnauthorizedAdminAction("${user3.address}")`
+      );
+    });
 
-    function blockMint() external virtual onlyOwner whenMintIsAllowed {
-        mintBlocked = true;
-        emit MintBlocked();
-    }
+    it('should transfer tokens', async function () {
+      const mintAmount = parseEther('100');
+      const transferAmount = parseEther('20');
+      await uavToken.connect(owner).mint(user1.address, mintAmount);
+      expect(await uavToken.balanceOf(user1.address)).to.equal(mintAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(0);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+      await uavToken.connect(user1).transfer(user2.address, transferAmount);
+      expect(await uavToken.balanceOf(user1.address)).to.equal(mintAmount - transferAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(transferAmount);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+    });
 
-    function blockAddress(address addressToBeBlocked) external virtual onlyAdmin {
-        _blockList.add(addressToBeBlocked);
-        emit AddressBlocked(addressToBeBlocked);
-    }
+    it('should reject transfer when blocked', async function () {
+      const mintAmount = parseEther('100');
+      const transferAmount = parseEther('20');
+      await uavToken.connect(admin).blockAddress(user2.address);
+      await uavToken.connect(owner).mint(user2.address, mintAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount);
+      expect(await uavToken.balanceOf(user3.address)).to.equal(0);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+      await expect(uavToken.connect(user2).transfer(user3.address, transferAmount)).to.be.revertedWith(
+        `UnauthorizedUserAction("${user2.address}")`
+      );
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount);
+      expect(await uavToken.balanceOf(user3.address)).to.equal(0);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+    });
 
-    function unblockAddress(address addressToBeUnblocked) external virtual onlyAdmin {
-        _blockList.remove(addressToBeUnblocked);
-        emit AddressUnblocked(addressToBeUnblocked);
-    }
-}
+    it('should transfer when unblocked', async function () {
+      const mintAmount = parseEther('100');
+      const transferAmount = parseEther('20');
+      await uavToken.connect(admin).blockAddress(user2.address);
+      await uavToken.connect(owner).mint(user2.address, mintAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount);
+      expect(await uavToken.balanceOf(user3.address)).to.equal(0);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+      await expect(uavToken.connect(user2).transfer(user3.address, transferAmount)).to.be.revertedWith(
+        `UnauthorizedUserAction("${user2.address}")`
+      );
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount);
+      expect(await uavToken.balanceOf(user3.address)).to.equal(0);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+      await uavToken.connect(admin).unblockAddress(user2.address);
+      await uavToken.connect(user2).transfer(user3.address, transferAmount);
+      expect(await uavToken.balanceOf(user2.address)).to.equal(mintAmount - transferAmount);
+      expect(await uavToken.balanceOf(user3.address)).to.equal(transferAmount);
+      expect(await uavToken.totalSupply()).to.equal(mintAmount);
+    });
+  });
+});
