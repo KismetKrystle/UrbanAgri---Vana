@@ -49,7 +49,7 @@ const config: HardhatUserConfig = {
     moksha: {
       url: process.env.MOKSHA_RPC_URL || "",
       chainId: 14800,
-      accounts:
+      accounts: ["0x24b6a67cff13689336cb46b620fc742536ff7afc5a16ce57fb70549d3c6d495d"],
         process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
     },
     satori: {
