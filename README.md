@@ -30,6 +30,31 @@ Sustainable urban farming solutions are crucial for our future. UrbanAgri_Curve 
 
 ![image](https://github.com/user-attachments/assets/a3d7814f-c8a9-4a40-b00d-61564bf1f644)
 
+**Join the Urban Farming Revolution:** Become part of the UrbanAgri DAO to collaborate on global urban sustainability projects, fund public goods, and promote data-driven urban agriculture as a solution for food security and urban resilience.
+
+**Why UrbanAgri_Curve?**
+With increasing urbanization and the need for sustainable city planning, data-driven urban agriculture is a vital solution—but it often lacks coordinated efforts and accessible data. UrbanAgri_Curve bridges these gaps, providing a platform for collaborative learning, rewards for meaningful contributions, and a thriving ecosystem to support your urban farming initiatives.
+
+**Call to Action:**
+Shape the future of your city, your impact, and urban sustainability. Join UrbanAgri_Curve, explore our data marketplace, master urban agricultural practices, and be part of a global movement to build more resilient and sustainable urban environments.
+
+UrbanAgri_Curve: Cultivating Smart Cities, One Data Point at a Time. 🏙️🌱
+
+## Contract Deployment via Hardhat
+Prepare the project for deployment:
+
+```sh
+cd blockchain
+npm install
+cp deployment-config.template.js deployment-config.development.js
+```
+
+Finally, deploy the smart-contract:
+
+```sh
+npm run dev
+```
+
 
 
 **Join the Urban Farming Revolution:** Become part of the UrbanAgri DAO to collaborate on global urban sustainability projects, fund public goods, and promote data-driven urban agriculture as a solution for food security and urban resilience.
