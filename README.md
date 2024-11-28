@@ -57,4 +57,3 @@ npm run dev
 
 
 
-**Join the Urban Farming Revolution:** Become part of the UrbanAgri DAO to collaborate on global urban sustainability projects, fund public goods, and promote data-driven urban agriculture as a solution for food security and urban resilience.
