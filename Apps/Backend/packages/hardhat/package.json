@@ -1,5 +1,5 @@
 {
-  "name": "vanaNetwork",
+  "name": "vana-network",
   "version": "1.0.0",
   "main": "index.js",
   "author": "ec.dumea@gmail.com",
@@ -20,16 +20,16 @@
     "test": "REPORT_GAS=true hardhat test --network hardhat",
     "verify": "hardhat etherscan-verify"
   },
-  "dependencies": { 
+  "dependencies": {
     "@ethersproject/address": "^5.7.0",
     "@openzeppelin/contracts": "~5.0.2",
     "@openzeppelin/contracts-upgradeable": "5.0.2",
-    "commander": "^12.1.0",
     "@typechain/ethers-v6": "~0.5.1",
+    "commander": "^12.1.0",
     "dotenv": "~16.4.5",
     "envfile": "~7.1.0",
+    "eth-crypto": "^2.6.0",
     "qrcode": "~1.5.4"
-    "eth-crypto": "^2.6.0"
   },
   "devDependencies": {
     "@ethersproject/abi": "~5.7.0",
@@ -40,7 +40,6 @@
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@nomicfoundation/hardhat-verify": "~2.0.10",
     "@openzeppelin/hardhat-upgrades": "^3.0.4",
-    "@typechain/ethers-v5": "~11.1.2",
     "@typechain/hardhat": "~9.1.0",
     "@types/chai": "^4.2.0",
     "@types/eslint": "~8.56.12",
@@ -58,14 +57,13 @@
     "ethers": "~6.13.2",
     "hardhat": "~2.22.10",
     "hardhat-deploy": "~0.12.4",
-    "hardhat-deploy-ethers": "~0.4.2",
-    "hardhat-gas-reporter": "~2.2.1",
+    "hardhat-gas-reporter": "^2.2.2",
     "prettier": "~3.3.3",
     "prettier-plugin-solidity": "^1.3.1",
     "solidity-coverage": "~0.8.13",
     "ts-node": "~10.9.1",
     "typechain": "~8.3.2",
-    "typescript": "<5.6.0"
+    "typescript": "<5.6.0",
     "yarn": "^1.22.21"
   }
 }
