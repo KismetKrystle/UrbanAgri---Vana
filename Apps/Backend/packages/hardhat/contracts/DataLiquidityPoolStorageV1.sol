@@ -1,28 +1,93 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "./IDataLiquidityPool.sol";
 
-/**
- * @title Storage for DataLiquidityPool
- * @notice For future upgrades, do not change DataLiquidityPoolStorageV1. Create a new
- * contract which implements DataLiquidityPoolStorageV1
- */
-abstract contract DataLiquidityPoolStorageV1 is IDataLiquidityPool {
-    string public override name;
-    IDataRegistry public override dataRegistry;
-    IERC20 public override token;
-    string public override publicKey;
-    string public override proofInstruction;
-    uint256 public override totalContributorsRewardAmount;
-    uint256 public override fileRewardFactor;
+interface IUrbanFarmDLP is IDataLiquidityPool {
+    // Events
+    event CommunityDataStored(
+        uint256 indexed communityId,
+        address indexed user
+    );
+    event SolutionGenerated(
+        uint256 indexed communityId,
+        string aiSolution,
+        address indexed user
+    );
+    event UserInteractionLogged(
+        uint256 indexed communityId,
+        address indexed user,
+        string action,
+        string details
+    );
+    event FeedbackSubmitted(
+        uint256 indexed communityId,
+        address indexed user,
+        string feedback
+    );
+    event CommunityRewardDistributed(
+        uint256 indexed communityId,
+        uint256 amount
+    );
 
-    mapping(uint256 fileId => File file) internal _files;
-    EnumerableSet.UintSet internal _filesList;
+    // Structs
+    struct CommunityData {
+        uint256 id;
+        string geoData;
+        string demographicData;
+        string agriculturalData;
+        string hydroponicData;
+    }
 
-    uint256 public override contributorsCount;
-    mapping(uint256 contributorId => address contributorAddress) internal _contributors;
-    mapping(address contributirAddress => Contributor contributor) internal _contributorInfo;
+    struct Solution {
+        string description;
+        uint256 timestamp;
+        address submitter;
+    }
 
-    ITeePool public override teePool;
+    struct UserInteraction {
+        address user;
+        string action;
+        string details;
+        uint256 timestamp;
+    }
+
+    // Functions
+    function storeCommunityData(
+        string memory geoData,
+        string memory demographicData,
+        string memory agriculturalData,
+        string memory hydroponicData
+    ) external;
+
+    function addSolution(
+        uint256 communityId,
+        string memory aiSolution
+    ) external;
+
+    function logUserInteraction(
+        uint256 communityId,
+        string memory action,
+        string memory details
+    ) external;
+
+    function submitFeedback(
+        uint256 communityId,
+        string memory feedback
+    ) external;
+
+    function getSolutions(
+        uint256 communityId
+    ) external view returns (Solution[] memory);
+
+    function getUserInteractions(
+        uint256 communityId
+    ) external view returns (UserInteraction[] memory);
+
+    function version() external pure returns (uint256);
+
+    function rewardToken() external view returns (IERC20Upgradeable);
+
+    function communityRewardPerSolution() external view returns (uint256);
 }
