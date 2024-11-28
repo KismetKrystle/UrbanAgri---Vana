@@ -1,6 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-chai-matchers");
-
+require('@nomiclabs/hardhat-ethers');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -11,5 +11,8 @@ module.exports = {
       accounts: ["0x24b6a67cff13689336cb46b620fc742536ff7afc5a16ce57fb70549d3c6d495d"],
       chainId: 14800,  // Replace with Moksha Testnet's chain ID
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,  // Optional if you want to verify contracts
   },
 };
