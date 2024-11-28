@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 node_modules/
+typechain-types
+artifacts
+cache
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,7 +18,7 @@ node_modules/
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production

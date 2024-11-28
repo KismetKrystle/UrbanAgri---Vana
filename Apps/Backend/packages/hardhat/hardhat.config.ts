@@ -8,17 +8,16 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@nomicfoundation/hardhat-verify";
 import "hardhat-deploy";
-import "hardhat-deploy-ethers";
 import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
 
-// If not set, it uses ours Alchemy's default API key.
+// If not set, it uses our Alchemy's default API key.
 // You can get your own at https://dashboard.alchemyapi.io
 const providerApiKey = process.env.ALCHEMY_API_KEY || "oKxs-03sij-U_N0iOlrSsZFr29-IqbuF";
 // If not set, it uses the hardhat account 0 private key.
 const deployerPrivateKey =
   process.env.DEPLOYER_PRIVATE_KEY ?? "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-// If not set, it uses ours Etherscan default API key.
+// If not set, it uses our Etherscan default API key.
 const etherscanApiKey = process.env.ETHERSCAN_API_KEY || "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW";
 
 const config: HardhatUserConfig = {
@@ -58,27 +57,7 @@ const config: HardhatUserConfig = {
       chainId: 14801,
       accounts:
         process.env.DEPLOYER_PRIVATE_KEY !== undefined ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
-    }
-  },
-  customChains: [
-      {
-        network: "moksha",
-        chainId: 14800,
-        urls: {
-          apiURL: "https://api.moksha.vanascan.io/api/",
-          browserURL: "https://moksha.vanascan.io",
-        }
-      },
-      {
-        network: "satori",
-        chainId: 14801,
-        urls: {
-          apiURL: process.env.SATORI_API_URL || "",
-          browserURL: process.env.SATORI_BROWSER_URL || "",
-        }
-      }
-    ]
-  },
+    },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${providerApiKey}`,
       accounts: [deployerPrivateKey],
@@ -152,31 +131,56 @@ const config: HardhatUserConfig = {
       accounts: [deployerPrivateKey],
     },
   },
-  // configuration for harhdat-verify plugin
+  // configuration for hardhat-verify plugin
   etherscan: {
     apiKey: `${etherscanApiKey}`,
+    customChains: [
+      {
+        network: "moksha",
+        chainId: 14800,
+        urls: {
+          apiURL: "https://api.moksha.vanascan.io/api/",
+          browserURL: "https://moksha.vanascan.io",
+        }
+      },
+      {
+        network: "satori",
+        chainId: 14801,
+        urls: {
+          apiURL: process.env.SATORI_API_URL || "",
+          browserURL: process.env.SATORI_BROWSER_URL || "",
+        }
+      }
+    ]
   },
   // configuration for etherscan-verify from hardhat-deploy plugin
   verify: {
     etherscan: {
       apiKey: `${etherscanApiKey}`,
     },
-    paths: {
+  },
+  paths: {
     sources: "./contracts",
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+    root: "../../"
   },
   mocha: {
     timeout: 40000,
   },
   gasReporter: {
-    enabled: true,
-    excludeContracts: ["mocks", "tests"],
-    include: ["../node_module/@openzeppelin/contracts-upgradeable"],
+    enabled: process.env.REPORT_GAS ? true : false,
+    currency: "USD",
+    outputFile: "gas-report.txt",
+    noColors: true,
   },
   sourcify: {
     enabled: false,
+  },
+  typechain: {
+    outDir: "typechain-types",
+    target: "ethers-v6",
   },
 };
 
