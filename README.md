@@ -27,8 +27,7 @@ Sustainable urban farming solutions are crucial for our future. UrbanAgri_Curve 
 
 **Earn and Contribute:** Participate in data collection and solution creation to earn blockchain-powered rewards. Your contributions unlock platform features, grant access to exclusive urban farming resources, and offer rewards in the community marketplace.
 
-
-![image](https://github.com/user-attachments/assets/a3d7814f-c8a9-4a40-b00d-61564bf1f644)
+<img width="1776" alt="UrbanAgri-GeneratingData" src="https://github.com/user-attachments/assets/bff97d50-94a1-4b6e-a44a-74cf42534a8a">
 
 **Join the Urban Farming Revolution:** Become part of the UrbanAgri DAO to collaborate on global urban sustainability projects, fund public goods, and promote data-driven urban agriculture as a solution for food security and urban resilience.
 
