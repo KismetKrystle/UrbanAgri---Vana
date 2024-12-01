@@ -14,7 +14,7 @@ The repository consists of two sub-projects:
 
 ## About the Project
 
-<img width="677" alt="image" src="https://github.com/user-attachments/assets/6a0a6c68-dde7-4684-850f-1a560e385e43">
+<img width="2289" alt="UrbanAgri-Smart Contract WorkFlow" src="https://github.com/user-attachments/assets/4f346147-db8b-444b-af3f-920cbe0e8623">
 
 
 Sustainable urban farming solutions are crucial for our future. UrbanAgri_Curve 🌿 is the essential platform for anyone ready to revolutionize urban agriculture. Whether you're a city dweller, community organizer, or urban planning enthusiast, UrbanAgri_Curve makes data-driven urban farming accessible, engaging, and rewarding for all.
