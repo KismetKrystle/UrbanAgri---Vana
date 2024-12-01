@@ -40,6 +40,7 @@ Shape the future of your city, your impact, and urban sustainability. Join Urban
 
 UrbanAgri DAO: Cultivating Smart Cities, One Data Point at a Time. 🏙️🌱
 
+If you want to review a mockup of the user experience, you can view it [here](https://www.figma.com/proto/fOjHp4IV9jjcpALBYbDsan/Urban-Agri?node-id=122-3037&starting-point-node-id=122%3A3037&t=OCXlMQHfvlkTHM4g-1).
 ## Contract Deployment via Hardhat
 Prepare the project for deployment:
 
