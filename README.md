@@ -5,7 +5,7 @@ Retrieving, Analyzing and Summarizing world Data to improve our understanding of
 
 We built our project using [MultiBaas](https://docs.curvegrid.com/multibaas/) to handle the complexities of interacting with an EVM smart contract. File name: UrbanAgri_Curve
 
-Smart Contracts are set to be deployed on the Vana Moksha Testnet (network was down at the time of testing), in the future our DLP will be searchable here https://moksha.vanascan.io 
+Smart Contracts are set to be deployed on the Vana Moksha Testnet (network was down at the time of testing and also currently incompatible with deploying on CurveGrid), in the future our DLP will be searchable at https://moksha.vanascan.io 
 
 The repository consists of two sub-projects:
 
